@@ -2,28 +2,42 @@ import pygame as gg
 import cv2 as cv
 import socket as ss
 from threading import Thread
+from random import randint
 
-class client():
+class client:
     def __init__(self):
-        self.client, self.server = self.init_client()
-        
-        
+        self.cliente_tcp = self.init_client_tcp()
+        self.name = self.put_name()
     
-    
-    def init_client(self):
+    def put_name(self):
         while True:
-            self.my_name = input("Name ---> ")
-            cliente = ss.socket(ss.AF_INET, ss.SOCK_DGRAM)
-            cliente.sendto(bytes(self.my_name.encode("utf-8")), (ss.gethostname(), 57574))
-            data, server = cliente.recvfrom(10000)
-            print(data)
-            if data.decode("utf-8") == f"hi {self.my_name}":
-                return [client, server]
-            elif data.decode("utf-8") == "change the name":
+            my_name = input("Name ---> ")
+            self.cliente_tcp.send(bytes(my_name, "utf-8"))
+            data = self.recv_tcp_data()
+            if data == "accept":
+                print("Confirmado")
+                return my_name
+            elif data == "nje":
                 print("Esse nome já existe!")
                 continue
             else:
                 continue
+
+    def request_video_chat(name):
+        pass
+    
+    def init_client_tcp(self):
+        cliente = ss.socket(ss.AF_INET, ss.SOCK_STREAM)
+        cliente.bind((ss.gethostname(), randint(10000, 60000)))
+        cliente.connect((ss.gethostname(), 14641))
+        return cliente
+    
+
+    def recv_tcp_data(self):
+        while True:
+            data = self.cliente_tcp.recv(10000)
+            if data:
+                return data.decode("utf-8")
 
     def cam(self, mn):
         abc = cv.VideoCapture(0)
