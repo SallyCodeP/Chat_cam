@@ -12,18 +12,29 @@ class video():
         Thread(target=self.qnts_conectados).start()
         Thread(target=self.accept_client).start()
 
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    #  Iniciando funções do servidor #
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    def qnts_conectados(self):
-        while True:
-            print(f"{len(self.client.keys())} clientes conectados!")
-            sleep(3)
-    
     def init_server_tcp(self):      
         tcp = ss.socket(ss.AF_INET, ss.SOCK_STREAM)
         tcp.bind((ss.gethostname(), 14641))
         tcp.listen(5)
         return tcp  
 
+    def qnts_conectados(self):
+        while True:
+            print(f"{len(self.client.keys())} clientes conectados!")
+            sleep(3)
+
+    def testando_conex():
+        while True:
+            pass
+
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    #  Aceitando e nomeando clientes #
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    
     def accept_client(self):
         while True:
             obj, dress = self.server.accept()
@@ -31,7 +42,21 @@ class video():
             name = self.__get_name(obj)
             self.client[name] = [obj, dress, ""]
 
+    
+    def __get_name(self, obj):
+        while True:
+            name = self.__recv_data(obj)
+            if name in self.client.keys():
+                obj.send(bytes("nje", "utf-8"))
+                continue
+            else:
+                obj.send(bytes("accept" ,"utf-8"))
+                return name
 
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    #  Estabelecendo conexão entre clientes  #
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    
     def conect_clients(self):
         id = self.__create_id()
         no_id = [names for names, cli in self.client.items() if len(cli[2]) != 0]
@@ -46,16 +71,11 @@ class video():
             if not abc in self.id:
                 return "".join(abc)  
 
-    def __get_name(self, obj):
-        while True:
-            name = self.__recv_data(obj)
-            if name in self.client.keys():
-                obj.send(bytes("nje", "utf-8"))
-                continue
-            else:
-                obj.send(bytes("accept" ,"utf-8"))
-                return name
-
+    
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    #  Receber dados do cliente  #
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    
     def __recv_data(self, obj):
         while True:
             data = obj.recv(100000)
