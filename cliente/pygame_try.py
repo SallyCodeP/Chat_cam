@@ -29,7 +29,7 @@ class client:
     def init_client_tcp(self):
         cliente = ss.socket(ss.AF_INET, ss.SOCK_STREAM)
         cliente.bind((ss.gethostname(), randint(10000, 60000)))
-        cliente.connect((ss.gethostname(), 14641))
+        cliente.connect((ss.gethostname(), 17723))
         return cliente
     
 

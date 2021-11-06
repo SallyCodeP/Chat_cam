@@ -10,6 +10,7 @@ class video():
         self.id = list()
         self.server = self.init_server_tcp()
         Thread(target=self.qnts_conectados).start()
+        Thread(target=self.testando_conex).start()
         Thread(target=self.accept_client).start()
 
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -18,7 +19,7 @@ class video():
 
     def init_server_tcp(self):      
         tcp = ss.socket(ss.AF_INET, ss.SOCK_STREAM)
-        tcp.bind((ss.gethostname(), 14641))
+        tcp.bind((ss.gethostname(), 17723))
         tcp.listen(5)
         return tcp  
 
@@ -27,10 +28,19 @@ class video():
             print(f"{len(self.client.keys())} clientes conectados!")
             sleep(3)
 
-    def testando_conex():
+    def testando_conex(self):
         while True:
-            pass
-
+            try:
+                for i, cli in self.client.items():
+                    try:
+                        cli[0].send(bytes("$", "utf-8"))
+                        sleep(3)
+                    except Exception:
+                        del self.client[i]
+            except RuntimeError:
+                print(self.client)
+                print(f"{i} desconectado!")
+                continue
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     #  Aceitando e nomeando clientes #
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
