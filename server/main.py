@@ -7,7 +7,7 @@ from time import sleep
 class video():
     def __init__(self):
         self.client = dict()
-        self.id = list()
+        self.dict_id = dict()
         self.server = self.init_server_tcp()
         Thread(target=self.qnts_conectados).start()
         Thread(target=self.testando_conex).start()
@@ -41,6 +41,7 @@ class video():
                 print(self.client)
                 print(f"{i} desconectado!")
                 continue
+    
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     #  Aceitando e nomeando clientes #
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -50,7 +51,7 @@ class video():
             obj, dress = self.server.accept()
             print(f"cliente {dress[0]} conectado!")
             name = self.__get_name(obj)
-            self.client[name] = [obj, dress, ""]
+            self.client[name] = [obj, dress]
 
     
     def __get_name(self, obj):
@@ -67,10 +68,31 @@ class video():
     #  Estabelecendo conexão entre clientes  #
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     
-    def conect_clients(self):
-        id = self.__create_id()
-        no_id = [names for names, cli in self.client.items() if len(cli[2]) != 0]
-        print(no_id)
+    def conect_clients(self, name):
+        while True:
+            obj = self.client[name][0]
+            obj.send(bytes("wc", "utf-8"))
+            conect = self.__recv_data(obj)
+            if not conect in self.dict_id.values():
+                if not conect in self.client.keys():
+                    obj.send(bytes("Contato n encontrado!", "utf-8"))
+                    continue
+                else:
+                    obj_cli = self.client[conect][0]
+                    obj_cli.send(f"{name} quer conectar!")
+                    resposta = self.__recv_data(obj_cli)
+                    if resposta == "conectar":
+                        pass
+                    else:
+                        obj.send("Conexao rejeitada!")
+                        
+                    
+                    self.dict_id[self.__create_id()] = [name, conect]
+                    break
+            else:
+                obj.send(bytes("Ja esta em uma chamada", "utf-8"))
+            no_id = [names for names, cli in self.client.items() if len(cli[2]) != 0]
+            print(no_id)
         
     def __create_id(self):
         while True:
@@ -78,7 +100,7 @@ class video():
             abc = [choice(choice(values)) for _ in range(0, 9)]
             abc.insert(3, "-")
             abc.insert(7, "-")
-            if not abc in self.id:
+            if not abc in self.dict_id.keys():
                 return "".join(abc)  
 
     

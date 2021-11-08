@@ -6,6 +6,7 @@ from random import randint
 
 class client:
     def __init__(self):
+        self.cam("chamada")
         self.cliente_tcp = self.init_client_tcp()
         self.name = self.put_name()
     
