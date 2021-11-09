@@ -69,30 +69,27 @@ class video():
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     
     def conect_clients(self, name):
-        while True:
             obj = self.client[name][0]
             obj.send(bytes("wc", "utf-8"))
             conect = self.__recv_data(obj)
             if not conect in self.dict_id.values():
                 if not conect in self.client.keys():
                     obj.send(bytes("Contato n encontrado!", "utf-8"))
-                    continue
                 else:
+                    obj.send(bytes("Pedido enviado!", "utf-8"))
                     obj_cli = self.client[conect][0]
                     obj_cli.send(f"{name} quer conectar!")
                     resposta = self.__recv_data(obj_cli)
                     if resposta == "conectar":
                         pass
                     else:
-                        obj.send("Conexao rejeitada!")
+                        obj.send(bytes("Conexao rejeitada!", "utf-8"))
                         
                     
                     self.dict_id[self.__create_id()] = [name, conect]
-                    break
             else:
                 obj.send(bytes("Ja esta em uma chamada", "utf-8"))
-            no_id = [names for names, cli in self.client.items() if len(cli[2]) != 0]
-            print(no_id)
+
         
     def __create_id(self):
         while True:
