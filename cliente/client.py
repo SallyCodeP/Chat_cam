@@ -51,6 +51,12 @@ class client:
             resposta = input("Qual cliente você gostaria de se conectar? -> ")
             self.cliente_tcp.send(bytes(resposta, "utf-8"))
             resposta = self.recv_tcp_data()
+            print(resposta)
+            if resposta == "Pedido enviado!":
+                resposta2 = self.recv_tcp_data()
+                print(resposta2)
+                if resposta2 == "Pedido aceito!":
+                    pass
 
     def qnts_clientes(self):
         self.cliente_tcp.send(bytes("qntscli", "utf-8"))
@@ -60,6 +66,13 @@ class client:
             print(qnts)
         else:
             print("Apenas você está conectado!")
+
+    def recv_invite(self):
+        while True:
+            invite = self.recv_tcp_data()
+            if "invite quer conectar!\n" in invite:
+                print(invite)
+                
 
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # Funções entres clientes udp  #

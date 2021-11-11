@@ -78,10 +78,10 @@ class video():
                 else:
                     obj.send(bytes("Pedido enviado!", "utf-8"))
                     obj_cli = self.client[conect][0]
-                    obj_cli.send(f"{name} quer conectar!")
+                    obj_cli.send(f"{name} quer conectar!\n")
                     resposta = self.__recv_data(obj_cli)
                     if resposta == "conectar":
-                        pass
+                        obj.send(bytes("Pedido aceito!", "utf-8"))
                     else:
                         obj.send(bytes("Conexao rejeitada!", "utf-8"))
                         
