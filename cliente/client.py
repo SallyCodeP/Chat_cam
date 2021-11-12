@@ -3,11 +3,13 @@ import cv2 as cv
 import socket as ss
 from threading import Thread
 from random import randint
+from pyautogui import confirm, alert
 
 class client:
     def __init__(self):
         self.cliente_tcp = self.init_client_tcp()
         self.name = self.put_name()
+        Thread(target=self.recv_invite).start()
 
 
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -34,29 +36,36 @@ class client:
         '''Registrando nome do cliente no servidor'''
         while True:
             my_name = input("Name ---> ")
-            self.cliente_tcp.send(bytes(my_name, "utf-8"))
-            data = self.recv_tcp_data()
-            if data == "accept":
-                print("Confirmado")
-                return my_name
-            elif data == "nje":
-                print("Esse nome já existe!")
-                continue
+            if self.send(my_name):
+                data = self.recv_tcp_data()
+                if data == "accept":
+                    print("Confirmado")
+                    return my_name
+                elif data == "nje":
+                    print("Esse nome já existe!")
+                    continue
+                else:
+                    continue
             else:
                 continue
 
     def pedir_conex(self):
         dado = self.recv_tcp_data()
         if dado == "wc":
-            resposta = input("Qual cliente você gostaria de se conectar? -> ")
-            self.cliente_tcp.send(bytes(resposta, "utf-8"))
-            resposta = self.recv_tcp_data()
-            print(resposta)
-            if resposta == "Pedido enviado!":
-                resposta2 = self.recv_tcp_data()
-                print(resposta2)
-                if resposta2 == "Pedido aceito!":
-                    pass
+            while True:
+                resposta = input("Qual cliente você gostaria de se conectar? -> ")
+                if self.send(resposta):
+                    resposta = self.recv_tcp_data()
+                    print(resposta)
+                    if resposta == "Pedido enviado!":
+                        resposta2 = self.recv_tcp_data()
+                        print(resposta2)
+
+                        if resposta2 == "Pedido aceito!":
+                            pass
+                            break
+                else:
+                    continue
 
     def qnts_clientes(self):
         self.cliente_tcp.send(bytes("qntscli", "utf-8"))
@@ -71,8 +80,17 @@ class client:
         while True:
             invite = self.recv_tcp_data()
             if "invite quer conectar!\n" in invite:
-                print(invite)
-                
+                resposta = confirm(text=invite, title='conectar', buttons=['Conectar', 'Recusar'])
+                self.cliente_tcp.send(bytes(resposta, "utf-8"))
+                continue
+
+    def send(self, msg):
+        if "\\" in msg or "$" in msg:
+           alert("Ha um caracter invalido na menssagem") 
+           return False
+        else:
+            self.cliente_tcp.send(bytes(msg, "utf-8"))
+            return True
 
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # Funções entres clientes udp  #
