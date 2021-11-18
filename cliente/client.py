@@ -10,7 +10,10 @@ class client:
         self.cliente_tcp = self.init_client_tcp()
         self.name = self.put_name()
         Thread(target=self.recv_invite).start()
-
+        while True:
+            querer = input("Pedir conexao (1) -> ")
+            if querer == "1":
+                self.pedir_conex()
 
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # Funções entre cliente e servidor tcp #
@@ -50,6 +53,7 @@ class client:
                 continue
 
     def pedir_conex(self):
+        self.cliente_tcp.send(bytes("want", "utf-8"))
         dado = self.recv_tcp_data()
         if dado == "wc":
             while True:

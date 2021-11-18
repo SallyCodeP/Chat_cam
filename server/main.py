@@ -17,6 +17,12 @@ class video():
     #  Iniciando funções do servidor #
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+    def menu(self, name):
+        while True:
+            dt = self.__recv_data(self.client[name][0])
+            if dt == "want":
+                self.conect_clients(name)
+
     def init_server_tcp(self):      
         tcp = ss.socket(ss.AF_INET, ss.SOCK_STREAM)
         tcp.bind((ss.gethostname(), 17723))
@@ -52,6 +58,8 @@ class video():
             print(f"cliente {dress[0]} conectado!")
             name = self.__get_name(obj)
             self.client[name] = [obj, dress]
+            Thread(target=self.menu, args=[name,]).start()
+
 
     
     def __get_name(self, obj):
