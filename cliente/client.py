@@ -68,6 +68,9 @@ class client:
                         if resposta2 == "Pedido aceito!":
                             pass
                             break
+                    elif resposta == "Voce nao pode se conectar com vc msm!":
+                        break
+                        
                 else:
                     continue
 
