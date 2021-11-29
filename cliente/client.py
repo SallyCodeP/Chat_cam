@@ -1,56 +1,8 @@
 import pygame as gg
-import cv2 as cv
 import socket as ss
-from threading import Thread
-from random import randint
 from pyautogui import confirm, alert
 
 class client:
-    def __init__(self):
-        self.cliente_tcp = self.init_client_tcp()
-        self.name = self.put_name()
-        Thread(target=self.recv_invite).start()
-        while True:
-            querer = input("Pedir conexao (1) -> ")
-            if querer == "1":
-                self.pedir_conex()
-
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # Funções entre cliente e servidor tcp #
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    
-    def init_client_tcp(self):
-        '''Iniciando cliente do servidor tcp'''
-        cliente = ss.socket(ss.AF_INET, ss.SOCK_STREAM)
-        cliente.bind((ss.gethostname(), randint(10000, 60000)))
-        cliente.connect((ss.gethostname(), 17723))
-        return cliente
-    
-    def recv_tcp_data(self):
-        '''Receber dados do server tcp'''
-        while True:
-            data = self.cliente_tcp.recv(10000)
-            if data:
-                decode_data = data.decode("utf-8")
-                if decode_data != "$":
-                    return decode_data
-
-    def put_name(self):
-        '''Registrando nome do cliente no servidor'''
-        while True:
-            my_name = input("Name ---> ")
-            if self.send(my_name):
-                data = self.recv_tcp_data()
-                if data == "accept":
-                    print("Confirmado")
-                    return my_name
-                elif data == "nje":
-                    print("Esse nome já existe!")
-                    continue
-                else:
-                    continue
-            else:
-                continue
 
     def pedir_conex(self):
         self.cliente_tcp.send(bytes("want", "utf-8"))
